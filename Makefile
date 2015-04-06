@@ -53,7 +53,7 @@ STEP_TEST_FILES = $(strip $(wildcard $(1)/tests/$($(2)).mal) $(wildcard tests/$(
 
 bash_STEP_TO_PROG =    bash/$($(1)).sh
 c_STEP_TO_PROG =       c/$($(1))
-clojure_STEP_TO_PROG = clojure/src/$($(1)).clj
+clojure_STEP_TO_PROG = clojure/src/mal/$($(1)).clj
 coffee_STEP_TO_PROG =  coffee/$($(1)).coffee
 cpp_STEP_TO_PROG =     cpp/$($(1))
 cs_STEP_TO_PROG =      cs/$($(1)).exe

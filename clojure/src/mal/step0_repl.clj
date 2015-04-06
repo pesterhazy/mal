@@ -1,4 +1,5 @@
-(ns mal.step0-repl)
+(ns mal.step0-repl
+  (:gen-class))
 
 (defn mread [x]
   x)
@@ -19,3 +20,6 @@
     (do
       (newline)
       (println "EOF."))))
+
+(defn -main []
+  (main-loop))
