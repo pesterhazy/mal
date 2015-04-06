@@ -40,16 +40,22 @@
                                                         (pr-str token))))))
    more])
 
+(def special-chars
+  {"'"  "quote",
+   "`"  "quasiquote",
+   "~"  "unquote",
+   "~@" "splice-unquote"})
+
 (defn read-quote [[token & more]]
   (let [[form remaining-tokens] (read-form more)]
-    [{:type :list, :val [{:type :symbol :val "quote"} form]}
+    [{:type :list, :val [{:type :symbol :val (special-chars token)} form]}
      remaining-tokens]))
 
 (defn read-form
   "Read a form. Returns a pair of [form remaining-tokens]"
   [[token & rst :as tokens]]
   (cond (= "(" token) (read-list tokens)
-        (= "'" token) (read-quote tokens)
+        (special-chars token) (read-quote tokens)
         :else (read-atom tokens)))
 
 (defn read-forms
