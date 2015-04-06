@@ -14,10 +14,12 @@
 (defn read-list [[_ & tokens]]
   (loop [[token & rst :as tokens] tokens
          xs []]
-    (if (= ")" token)
-      [{:type :list, :val xs} rst]
-      (let [[x rst] (read-form tokens)]
-        (recur rst (conj xs x))))))
+    (cond
+      (nil? token) (throw (ex-info "Expected ')', got EOF."
+                                   {:type :parse-error}))
+      (= ")" token) [{:type :list, :val xs} rst]
+      :else (let [[x rst] (read-form tokens)]
+              (recur rst (conj xs x))))))
 
 (defn is-symbol? [st] (re-find #"^[a-zA-Z+*/-][\w'+*/-]*$" st))
 (defn is-string? [st] (re-find #"^\".*\"$" st))

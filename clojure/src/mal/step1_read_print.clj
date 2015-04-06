@@ -11,7 +11,12 @@
 (defn mprint [x]
   (pri-forms x))
 (defn mrep [x]
-  (-> x mread meval mprint))
+  (try
+    (-> x mread meval mprint)
+    (catch clojure.lang.ExceptionInfo e
+      (if (= :parse-error (-> e ex-data :type))
+        (println (.getMessage e))
+        (throw e)))))
 
 (defn mrepl []
   (print "user> ")
