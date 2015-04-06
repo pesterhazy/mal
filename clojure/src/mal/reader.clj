@@ -52,3 +52,7 @@
       (let [[form remaining] (read-form tokens)]
         (recur remaining (conj forms form)))
       forms)))
+
+(defn read-str
+  [st]
+  (-> st tokenize read-forms))

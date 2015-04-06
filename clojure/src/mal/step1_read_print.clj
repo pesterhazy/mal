@@ -1,13 +1,15 @@
 (ns mal.step1-read-print
+  (:require [mal.reader :refer [read-str]]
+            [mal.printer :refer [pri-forms]])
   (:import [jline.console ConsoleReader])
   (:gen-class))
 
 (defn mread [x]
-  x)
+  (read-str x))
 (defn meval [x]
   x)
 (defn mprint [x]
-  x)
+  (pri-forms x))
 (defn mrep [x]
   (-> x mread meval mprint))
 
@@ -16,7 +18,7 @@
   (flush)
   (if-let [input (read-line)]
     (do
-      (println input)
+      (println (mrep input))
       (recur))
     (do
       (newline)
@@ -25,7 +27,7 @@
 (defn repl []
   (if-let [input (-> (ConsoleReader.) (.readLine "user> "))]
     (do
-      (println input)
+      (println (mrep input))
       (recur))
     (do
       (newline)
