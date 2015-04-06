@@ -11,18 +11,30 @@
        (map second)
        (keep #(when-not (empty? %) %))))
 
-(defn read-list [[_ & tokens]]
-  (loop [[token & rst :as tokens] tokens
-         xs []]
-    (cond
-      (nil? token) (throw (ex-info "Expected ')', got EOF."
-                                   {:type :parse-error}))
-      (= ")" token) [{:type :list, :val xs} rst]
-      :else (let [[x rst] (read-form tokens)]
-              (recur rst (conj xs x))))))
+(def brackets
+  {"(" {:closing ")", :type :list},
+   "[" {:closing "]", :type :vector}
+   "{" {:closing "}", :type :hash-map}})
+
+(def brackets-closing
+  (->> brackets vals (map :closing) set))
+
+(defn read-list [[token & tokens]]
+  (let [{:keys [closing type]} (brackets token)]
+    (loop [[token & rst :as tokens] tokens
+           xs []]
+      (cond
+        (= closing token) [{:type type, :val xs} rst]
+        (nil? token) (throw (ex-info (str "Expected '" closing "', got EOF.")
+                                     {:type :parse-error}))
+        (brackets-closing token) (throw (ex-info (str "Expected '" closing "', got '" token "'.")
+                                                 {:type :parse-error}))
+        :else (let [[x rst] (read-form tokens)]
+                (recur rst (conj xs x)))))))
 
 (defn is-symbol? [st] (re-find #"^[a-zA-Z+*/-][\w'+*/-]*$" st))
 (defn is-string? [st] (re-find #"^\".*\"$" st))
+(defn read-keyword [st] (some-> (re-find #"^:(.*)$" st) second))
 
 (defn parse-num [st]
   (try
@@ -36,6 +48,7 @@
 (defn read-atom [[token & more]]
   [(cond (is-symbol? token) {:type :symbol, :val token}
          (is-string? token) {:type :string, :val (edn/read-string token)}
+         (read-keyword token) {:type :keyword, :val (read-keyword token)}
          :else (if-let [num (parse-num token)]
                  {:type :number, :val num}
                  (throw (IllegalArgumentException. (str "Failed to parse token "
@@ -48,6 +61,8 @@
    "~"  "unquote",
    "~@" "splice-unquote"})
 
+
+
 (defn read-quote [[token & more]]
   (let [[form remaining-tokens] (read-form more)]
     [{:type :list, :val [{:type :symbol :val (special-chars token)} form]}
@@ -56,9 +71,12 @@
 (defn read-form
   "Read a form. Returns a pair of [form remaining-tokens]"
   [[token & rst :as tokens]]
-  (cond (= "(" token) (read-list tokens)
-        (special-chars token) (read-quote tokens)
-        :else (read-atom tokens)))
+  (cond
+    (nil? token) nil
+    (.startsWith token ";") (recur rst)
+    (brackets token) (read-list tokens)
+    (special-chars token) (read-quote tokens)
+    :else (read-atom tokens)))
 
 (defn read-forms
   [tokens]
