@@ -40,12 +40,17 @@
                                                         (pr-str token))))))
    more])
 
+(defn read-quote [[token & more]]
+  (let [[form remaining-tokens] (read-form more)]
+    [{:type :list, :val [{:type :symbol :val "quote"} form]}
+     remaining-tokens]))
+
 (defn read-form
   "Read a form. Returns a pair of [form remaining-tokens]"
   [[token & rst :as tokens]]
-  (if (= "(" token)
-    (read-list tokens)
-    (read-atom tokens)))
+  (cond (= "(" token) (read-list tokens)
+        (= "'" token) (read-quote tokens)
+        :else (read-atom tokens)))
 
 (defn read-forms
   [tokens]
