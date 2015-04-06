@@ -1,5 +1,6 @@
 (ns user
   (:require [mal.reader :refer :all]
+            [mal.printer :refer :all]
             [clojure.java.io :as io]
             [clojure.java.javadoc :refer [javadoc]]
             [clojure.pprint :refer [pprint]]

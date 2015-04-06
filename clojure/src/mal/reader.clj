@@ -38,7 +38,17 @@
    more])
 
 (defn read-form
+  "Read a form. Returns a pair of [form remaining-tokens]"
   [[token & rst :as tokens]]
   (if (= "(" token)
     (read-list tokens)
     (read-atom tokens)))
+
+(defn read-forms
+  [tokens]
+  (loop [tokens tokens
+         forms []]
+    (if tokens
+      (let [[form remaining] (read-form tokens)]
+        (recur remaining (conj forms form)))
+      forms)))
