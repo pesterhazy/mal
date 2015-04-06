@@ -1,5 +1,5 @@
 (ns user
-  (:require [mal.step0-repl :refer :all]
+  (:require [mal.reader :refer :all]
             [clojure.java.io :as io]
             [clojure.java.javadoc :refer [javadoc]]
             [clojure.pprint :refer [pprint]]
