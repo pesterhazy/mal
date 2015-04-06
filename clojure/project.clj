@@ -4,7 +4,9 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [jline "2.11"]
                  [me.raynes/conch "0.8.0"]]
+  :repl-options {:init-ns user}
   :main mal.step0-repl
   :profiles {:step0 {:main mal.step0-repl}
              :step1 {:main mal.step1-read-print}

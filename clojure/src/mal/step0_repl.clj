@@ -1,4 +1,5 @@
 (ns mal.step0-repl
+  (:import [jline.console ConsoleReader])
   (:gen-class))
 
 (defn mread [x]
@@ -10,7 +11,7 @@
 (defn mrep [x]
   (-> x mread meval mprint))
 
-(defn main-loop []
+(defn mrepl []
   (print "user> ")
   (flush)
   (if-let [input (read-line)]
@@ -21,5 +22,14 @@
       (newline)
       (println "EOF."))))
 
+(defn repl []
+  (if-let [input (-> (ConsoleReader.) (.readLine "user> "))]
+    (do
+      (println input)
+      (recur))
+    (do
+      (newline)
+      (println "EOF."))))
+
 (defn -main []
-  (main-loop))
+  (repl))
