@@ -1,4 +1,6 @@
-(ns mal.reader)
+(ns mal.reader
+  (require [clojure.edn :as edn])
+  )
 
 (declare read-form)
 
@@ -18,6 +20,7 @@
         (recur rst (conj xs x))))))
 
 (defn is-symbol? [st] (re-find #"^[a-zA-Z+*/-][\w'+*/-]*$" st))
+(defn is-string? [st] (re-find #"^\".*\"$" st))
 
 (defn parse-num [st]
   (try
@@ -29,12 +32,12 @@
           nil)))))
 
 (defn read-atom [[token & more]]
-  [(if (is-symbol? token)
-     {:type :symbol, :val token}
-     (if-let [num (parse-num token)]
-       {:type :number, :val num}
-       (throw (IllegalArgumentException. (str "Failed to parse token "
-                                              (pr-str token))))))
+  [(cond (is-symbol? token) {:type :symbol, :val token}
+         (is-string? token) {:type :string, :val (edn/read-string token)}
+         :else (if-let [num (parse-num token)]
+                 {:type :number, :val num}
+                 (throw (IllegalArgumentException. (str "Failed to parse token "
+                                                        (pr-str token))))))
    more])
 
 (defn read-form

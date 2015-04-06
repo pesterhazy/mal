@@ -5,6 +5,7 @@
   (case type
     :number (str val)
     :symbol (str val)
+    :string (pr-str val)
     :list (str "("
                (->> val
                     (map pri-str)
