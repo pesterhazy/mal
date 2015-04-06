@@ -17,7 +17,7 @@
       (let [[x rst] (read-form tokens)]
         (recur rst (conj xs x))))))
 
-(defn is-symbol? [st] (re-find #"^[a-zA-Z]\w*$" st))
+(defn is-symbol? [st] (re-find #"^[a-zA-Z+*/-][\w'+*/-]*$" st))
 
 (defn parse-num [st]
   (try
@@ -33,7 +33,7 @@
      {:type :symbol, :val token}
      (if-let [num (parse-num token)]
        {:type :number, :val num}
-       (throw (IllegalArgumentException. (str "Cannot parse token "
+       (throw (IllegalArgumentException. (str "Failed to parse token "
                                               (pr-str token))))))
    more])
 
