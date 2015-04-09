@@ -51,8 +51,8 @@
          (read-keyword token) {:type :keyword, :val (read-keyword token)}
          :else (if-let [num (parse-num token)]
                  {:type :number, :val num}
-                 (throw (IllegalArgumentException. (str "Failed to parse token "
-                                                        (pr-str token))))))
+                 (throw (ex-info (str "Failed to parse token " (pr-str token))
+                                 {:type :parse-error}))))
    more])
 
 (def special-chars
