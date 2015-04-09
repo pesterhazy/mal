@@ -1,6 +1,6 @@
 (ns mal.reader
-  (require [clojure.edn :as edn])
-  )
+  (require [clojure.edn :as edn]
+           [mal.core :refer [->MalKeyword]]))
 
 (declare read-form)
 
@@ -48,7 +48,7 @@
 (defn read-atom [[token & more]]
   [(cond (is-symbol? token) {:type :symbol, :val token}
          (is-string? token) {:type :string, :val (edn/read-string token)}
-         (read-keyword token) {:type :keyword, :val (read-keyword token)}
+         (read-keyword token) {:type :keyword, :val (-> token read-keyword ->MalKeyword)}
          :else (if-let [num (parse-num token)]
                  {:type :number, :val num}
                  (throw (ex-info (str "Failed to parse token " (pr-str token))
@@ -95,4 +95,4 @@
 
 (defn read-str
   [st]
-  (-> st tokenize read-forms))
+  (-> st tokenize read-form first))
