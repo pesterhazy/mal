@@ -59,13 +59,18 @@
   {"'"  "quote",
    "`"  "quasiquote",
    "~"  "unquote",
-   "~@" "splice-unquote"})
-
-
+   "~@" "splice-unquote"
+   "@"  "deref"})
 
 (defn read-quote [[token & more]]
   (let [[form remaining-tokens] (read-form more)]
     [{:type :list, :val [{:type :symbol :val (special-chars token)} form]}
+     remaining-tokens]))
+
+(defn read-with-meta [[token & more]]
+  (let [[meta-form remaining-tokens] (read-form more)
+        [target-form remaining-tokens] (read-form remaining-tokens)]
+    [{:type :list, :val [{:type :symbol :val "with-meta"} target-form meta-form]}
      remaining-tokens]))
 
 (defn read-form
@@ -76,6 +81,7 @@
     (.startsWith token ";") (recur rst)
     (brackets token) (read-list tokens)
     (special-chars token) (read-quote tokens)
+    (= "^" token) (read-with-meta tokens)
     :else (read-atom tokens)))
 
 (defn read-forms
